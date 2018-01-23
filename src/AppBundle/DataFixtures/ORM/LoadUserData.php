@@ -27,27 +27,36 @@ class LoadUserData extends Fixture
         $user1->setNom("Dioumassi")
               ->setPrenom("Mohamed")
               ->setEmail("mdioumassi@yahoo.fr")
-              ->setActif("1");
+              ->setGroupe($this->getReference('groupe1'))
+              ->setActivated(1);
         $manager->persist($user1);
 
         $user2 = new User();
-        $user2->setNom("Pelletier")
+        $user2
+            ->setNom("Pelletier")
             ->setPrenom("Nicolas")
             ->setEmail("p.nicolas@yahoo.fr")
-            ->setActif("1");
+            ->setGroupe($this->getReference('groupe2'))
+            ->setActivated(1);
         $manager->persist($user2);
 
         $user3 = new User();
-        $user3->setNom("Bernat")
+        $user3
+            ->setNom("Bernat")
             ->setPrenom("Mathieu")
             ->setEmail("m.bernat@yahoo.fr")
-            ->setActif("1");
+            ->setGroupe($this->getReference('groupe2'))
+            ->setActivated(1);
         $manager->persist($user3);
 
         $manager->flush();
+    }
 
-        $this->addReference("user1", $user1);
-        $this->addReference("user2", $user2);
-        $this->addReference("user3", $user3);
+
+    public function getDependencies()
+    {
+        return [
+            LoadGroupeData::class,
+        ];
     }
 }

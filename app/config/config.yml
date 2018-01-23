@@ -18,7 +18,7 @@ framework:
     form: ~
     csrf_protection: ~
     validation: { enable_annotations: true }
-    serializer: { enable_annotations: true }
+    serializer: { enable_annotations: true}
     templating:
         engines: ['twig']
     default_locale: '%locale%'
@@ -69,13 +69,19 @@ swiftmailer:
     spool: { type: memory }
 
 fos_rest:
+    serializer:
+        serialize_null:  true
     routing_loader:
         include_format: false
     view:
         view_response_listener: true
     format_listener:
         rules:
-            - { path: '^/', priorities: ['json'], fallback_format: 'json' }
-  # configuration à rajouter pour désactiver le body listener
+            - { path: '^/api', priorities: ['json'], fallback_format: 'json' }
     body_listener:
         enabled: true
+
+nelmio_api_doc: ~
+framework:
+    templating:
+        engines: ['twig']

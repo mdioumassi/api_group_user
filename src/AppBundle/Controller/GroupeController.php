@@ -3,7 +3,10 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Groupe;
+use AppBundle\Entity\User;
 use AppBundle\Form\GroupeType;
+use FOS\RestBundle\Request\ParamFetcher;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,7 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 class GroupeController extends Controller
 {
     /**
-     * @Rest\View()
+     * @ApiDoc(
+     *     description="La liste des groupes"
+     * )
+     * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"groups"})
      * @Rest\Get("/groupes")
      */
     public function getGroupesAction(){
@@ -27,6 +33,9 @@ class GroupeController extends Controller
     }
 
     /**
+     * @ApiDoc(
+     *     description="Créer un groupe"
+     * )
      * @Rest\View(statusCode=Response::HTTP_CREATED)
      * @Rest\Post("/groupes")
      * @param Request $request
@@ -47,7 +56,10 @@ class GroupeController extends Controller
     }
 
     /**
-     * @Rest\View()
+     * @ApiDoc(
+     *     description="Afficher un groupe"
+     * )
+     * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"groups"})
      * @Rest\Get("/groupes/{id}")
      */
     public function getGroupeAction(Request $request){
@@ -61,17 +73,14 @@ class GroupeController extends Controller
     }
 
     /**
-     * @Rest\View()
-     * @Rest\Patch("/groupes/{id}")
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"groups"})
+     * @Rest\Put("/groupes/{id}")
      * @param Request $request
      */
     public function patchGroupeAction(Request $request){
-        $this->updateGroupe($request, false);
-    }
 
-    public function updateGroupe(Request $request, $clearMissing){
         $groupe = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('AppBundle:Groupe')
+            ->getRepository(Groupe::class)
             ->find($request->get('id'));
 
         if(empty($groupe)){
@@ -79,11 +88,11 @@ class GroupeController extends Controller
         }
 
         $form = $this->createForm(GroupeType::class, $groupe);
-        $form->submit($request->request->all(), $clearMissing);
+        $form->submit($request->request->all());
 
         if($form->isValid()){
             $em = $this->get('doctrine.orm.entity_manager');
-            $em->persist($groupe);
+            $em->merge($groupe);
             $em->flush();
             return $groupe;
         }else{
@@ -91,4 +100,23 @@ class GroupeController extends Controller
         }
     }
 
+    /**
+     * @param ParamFetcher $paramFetcher
+     *
+     * @ApiDoc(
+     *     description="La liste des utilisateurs d'un groupe"
+     * )
+     *
+     * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"users", "groups"})
+     * @Rest\Get("/groupes/{id}/users")
+     */
+    public function getUsersGroupAction(Request $request)
+    {
+        $groupe = $this->get('doctrine.orm.entity_manager')
+                      ->getRepository(Groupe::class)
+                      ->findBygroupeId($request->get('id'));
+        $users = $groupe;
+
+        return $users;
+    }
 }

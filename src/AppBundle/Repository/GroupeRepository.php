@@ -10,4 +10,16 @@ namespace AppBundle\Repository;
  */
 class GroupeRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function findBygroupeId($groupe)
+    {
+        $query = $this->getEntityManager()
+                      ->createQuery('
+                            SELECT u
+                            FROM AppBundle:User u
+                            JOIN u.groupe g 
+                            WHERE g.id = :groupe
+                      ');
+        $query->setParameter('groupe', $groupe);
+        return $query->getResult();
+    }
 }

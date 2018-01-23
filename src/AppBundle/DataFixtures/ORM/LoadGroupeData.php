@@ -24,14 +24,11 @@ class LoadGroupeData extends  Fixture
     public function load(ObjectManager $manager)
     {
         $groupe1 = new Groupe();
-        $groupe1->setNom("Administrateurs")
-                ->addUser($this->getReference('user1'));
+        $groupe1->setNom("Administrateurs");
         $manager->persist($groupe1);
 
         $groupe2 = new Groupe();
-        $groupe2->setNom("Editeur")
-                ->addUser($this->getReference('user2'))
-                ->addUser($this->getReference('user3'));
+        $groupe2->setNom("Editeur");
         $manager->persist($groupe2);
 
         $groupe3 = new Groupe();
@@ -39,12 +36,10 @@ class LoadGroupeData extends  Fixture
         $manager->persist($groupe3);
 
         $manager->flush();
+
+        $this->addReference('groupe1', $groupe1);
+        $this->addReference('groupe2', $groupe2);
+        $this->addReference('groupe3', $groupe3);
     }
 
-    public function getDependencies()
-    {
-        return [
-            LoadUserData::class,
-        ];
-    }
 }

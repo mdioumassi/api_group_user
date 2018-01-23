@@ -2,22 +2,31 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Entity\Traits\CreatedAtTrait;
+use AppBundle\Entity\Traits\UpdatedAtTrait;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * Groupe
  *
  * @ORM\Table(name="groupes")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\GroupeRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Groupe
 {
+    use CreatedAtTrait;
+
     /**
      * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Groups({"users", "groups"})
      */
     private $id;
 
@@ -25,21 +34,22 @@ class Groupe
      * @var string
      *
      * @ORM\Column(name="nom", type="string", length=255)
+     * @Serializer\Groups({"users", "groups"})
+     * @Assert\NotBlank()
      */
     private $nom;
 
 
     /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\User")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\User", mappedBy="groupes")
      */
-    private $user;
+    private $users;
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->user = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -85,7 +95,7 @@ class Groupe
      */
     public function addUser(\AppBundle\Entity\User $user)
     {
-        $this->user[] = $user;
+        $this->users[] = $user;
 
         return $this;
     }
@@ -97,16 +107,16 @@ class Groupe
      */
     public function removeUser(\AppBundle\Entity\User $user)
     {
-        $this->user->removeElement($user);
+        $this->users->removeElement($user);
     }
 
     /**
-     * Get user
+     * Get users
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getUser()
+    public function getUsers()
     {
-        return $this->user;
+        return $this->users;
     }
 }

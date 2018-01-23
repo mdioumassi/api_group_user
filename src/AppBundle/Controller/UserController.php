@@ -8,19 +8,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\View;
-use FOS\RestBundle\View\ViewHandler;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
     /**
-     * @Rest\View()
+     * @ApiDoc(
+     *     description="Recupère l'ensemble des utilisateurs"
+     * )
+     * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"users"})
      * @Rest\Get("/users")
      */
    public function getUsersAction(){
         $users = $this->get('doctrine.orm.entity_manager')
-                 ->getRepository('AppBundle:User')
+                 ->getRepository(User::class)
                  ->findAll();
         if(empty($users)){
             return new JsonResponse(['message' => 'Not user found'], Response::HTTP_NOT_FOUND);
@@ -29,16 +31,21 @@ class UserController extends Controller
    }
 
     /**
-     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @ApiDoc(
+     *     description="Créer un utilisateur",
+     *     input={"class"=UserType::class, "name"=""}
+     * )
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"users"})
      * @Rest\Post("/users")
-     * @param Request $request
+     * @
      */
    public function postUsersAction(Request $request){
 
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
-
-        $form->submit($request->request->all());
+        $data = $request->request->all();
+        //$user->setGroupe($data['groupe']);
+        $form->submit($data);
 
         if($form->isValid()){
             $em = $this->get('doctrine.orm.entity_manager');
@@ -51,7 +58,10 @@ class UserController extends Controller
    }
 
     /**
-     * @Rest\View()
+     * @ApiDoc(
+     *     description="Afficher les informations d'un utilisateurs"
+     * )
+     * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"users"})
      * @Rest\Get("/users/{user_id}")
      */
     public function getUserAction(Request $request){
@@ -67,9 +77,8 @@ class UserController extends Controller
     }
 
     /**
-     * @Rest\View()
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"users"})
      * @Rest\Patch("/users/{id}")
-     * @param Request $request
      */
     public function patchUserAction(Request $request)
     {
@@ -96,4 +105,4 @@ class UserController extends Controller
             return $form;
         }
     }
-}http://127.0.0.1:8000/users
+}

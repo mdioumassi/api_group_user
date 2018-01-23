@@ -1,0 +1,23 @@
+AppBundle\Entity\Groupe:
+       attributes:
+            id:
+               groups: ['groupe', 'user']
+            nom:
+               groups: ['groupe', 'user']
+            users:
+               groups: ['groupe']
+
+AppBundle\Entity\User:
+       attributes:
+            id:
+               groups: ['groupe', 'user']
+            nom:
+               groups: ['groupe', 'user']
+            prenom:
+               groups: ['groupe', 'user']
+            email:
+              groups: ['groupe', 'user']
+            active:
+              groups: ['groupe', 'user']
+            groupe :
+               groups: ['user']

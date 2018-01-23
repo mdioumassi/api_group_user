@@ -2,7 +2,11 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Entity\Traits\ActivatedTrait;
+use AppBundle\Entity\Traits\CreatedAtTrait;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * User
@@ -11,15 +15,19 @@ use Doctrine\ORM\Mapping as ORM;
  *     uniqueConstraints={@ORM\UniqueConstraint(name="users_email_unique", columns={"email"})}
  * )
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class User
 {
+    use ActivatedTrait;
+    use CreatedAtTrait;
     /**
      * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Groups({"users"})
      */
     private $id;
 
@@ -27,6 +35,8 @@ class User
      * @var string
      *
      * @ORM\Column(name="nom", type="string", length=255)
+     * @Serializer\Groups({"users"})
+     * @Assert\NotBlank()
      */
     private $nom;
 
@@ -34,6 +44,8 @@ class User
      * @var string
      *
      * @ORM\Column(name="prenom", type="string", length=255)
+     * @Serializer\Groups({"users"})
+     * @Assert\NotBlank()
      */
     private $prenom;
 
@@ -41,30 +53,16 @@ class User
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255)
+     * @Serializer\Groups({"users"})
+     * @Assert\Email()
      */
     private $email;
 
     /**
-     * @var bool
-     *
-     * @ORM\Column(name="actif", type="boolean")
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Groupe", inversedBy="users")
+     * @Serializer\Groups({"users"})
      */
-    private $actif;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     */
-    private $createdAt;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->setCreatedAt(new \DateTime("now"));
-    }
+    private $groupe;
 
     /**
      * Get id
@@ -149,50 +147,36 @@ class User
     }
 
     /**
-     * Set actif
-     *
-     * @param boolean $actif
-     *
-     * @return User
-     */
-    public function setActif($actif)
-    {
-        $this->actif = $actif;
-
-        return $this;
-    }
-
-    /**
-     * Get actif
+     * Get activated
      *
      * @return boolean
      */
-    public function getActif()
+    public function getActivated()
     {
-        return $this->actif;
+        return $this->activated;
     }
 
     /**
-     * Set createdAt
+     * Set groupe
      *
-     * @param \DateTime $createdAt
+     * @param \AppBundle\Entity\Groupe $groupe
      *
      * @return User
      */
-    public function setCreatedAt($createdAt)
+    public function setGroupe(\AppBundle\Entity\Groupe $groupe = null)
     {
-        $this->createdAt = $createdAt;
+        $this->groupe = $groupe;
 
         return $this;
     }
 
     /**
-     * Get createdAt
+     * Get groupe
      *
-     * @return \DateTime
+     * @return \AppBundle\Entity\Groupe
      */
-    public function getCreatedAt()
+    public function getGroupe()
     {
-        return $this->createdAt;
+        return $this->groupe;
     }
 }
